@@ -40,14 +40,14 @@ export const dnsTools = [
   whmTool({
     name: "whm_delete_dns_zone",
     description: "Delete a DNS zone",
-    mode: "destroy",
+    mode: "critical",
     fn: "killdns",
     input: { domain },
   }),
   whmTool({
     name: "whm_reset_dns_zone",
     description: "Reset a DNS zone to the server defaults, discarding custom records",
-    mode: "destroy",
+    mode: "critical",
     fn: "resetzone",
     input: { domain },
   }),
@@ -68,7 +68,7 @@ export const dnsTools = [
   whmTool({
     name: "whm_remove_dns_record",
     description: "Remove a record from a DNS zone",
-    mode: "destroy",
+    mode: "critical",
     fn: "removezonerecord",
     input: { zone: domain, line },
   }),

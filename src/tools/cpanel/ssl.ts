@@ -25,7 +25,7 @@ export const sslTools = [
   uapiTool({
     name: "cpanel_delete_ssl_cert",
     description: "Delete an SSL certificate from the account",
-    mode: "destroy",
+    mode: "critical",
     module: "SSL",
     fn: "delete_cert",
     input: { id: z.string().min(1).describe("Certificate id from cpanel_list_ssl_certs") },

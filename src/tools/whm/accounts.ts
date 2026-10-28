@@ -51,7 +51,7 @@ export const accountTools = [
   whmTool({
     name: "whm_suspend_account",
     description: "Suspend a cPanel account",
-    mode: "write",
+    mode: "critical",
     fn: "suspendacct",
     input: { user, reason: z.string().optional() },
   }),
@@ -65,7 +65,7 @@ export const accountTools = [
   whmTool({
     name: "whm_remove_account",
     description: "Permanently terminate a cPanel account and delete its data",
-    mode: "destroy",
+    mode: "critical",
     fn: "removeacct",
     input: { user, keepdns: z.boolean().optional().describe("Keep the DNS zones") },
   }),
@@ -79,7 +79,7 @@ export const accountTools = [
   whmTool({
     name: "whm_change_password",
     description: "Change the password of a cPanel account",
-    mode: "write",
+    mode: "critical",
     fn: "passwd",
     input: { user, password: z.string().min(1) },
   }),
@@ -107,7 +107,7 @@ export const accountTools = [
   whmTool({
     name: "whm_create_user_session",
     description: "Create a one-time login URL for an account's cPanel, Webmail or WHM",
-    mode: "write",
+    mode: "critical",
     fn: "create_user_session",
     input: {
       user,

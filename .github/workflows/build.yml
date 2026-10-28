@@ -1,0 +1,60 @@
+name: Build binary
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Build target
+        type: choice
+        default: bun-linux-x64
+        options:
+          - bun-linux-x64
+          - bun-linux-x64-baseline
+          - bun-linux-arm64
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Test and compile
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.3.14
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run typecheck
+
+      - run: bun test
+
+      - name: Compile
+        env:
+          TARGET: ${{ inputs.target }}
+        run: |
+          bun build --compile --minify \
+            --no-compile-autoload-dotenv --no-compile-autoload-bunfig \
+            --target="$TARGET" src/cli.ts --outfile dist/cpmoshai
+          cp deploy/* dist/
+          (cd dist && sha256sum cpmoshai > cpmoshai.sha256)
+
+      - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+        with:
+          subject-path: dist/cpmoshai
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: cpmoshai-${{ inputs.target }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30

@@ -48,7 +48,7 @@ export const packageTools = [
   whmTool({
     name: "whm_delete_package",
     description: "Delete a hosting package",
-    mode: "destroy",
+    mode: "critical",
     fn: "killpkg",
     input: { pkgname: name },
   }),

@@ -1,0 +1,44 @@
+[Unit]
+Description=cpmoshai MCP server for cPanel and WHM
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cpmoshai
+Group=nobody
+SupplementaryGroups=systemd-journal
+UMask=0117
+ExecStart=/usr/local/bin/cpmoshai serve
+Restart=on-failure
+RestartSec=2
+
+RuntimeDirectory=cpmoshai
+RuntimeDirectoryMode=0750
+StateDirectory=cpmoshai
+StateDirectoryMode=0700
+
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+
+[Install]
+WantedBy=multi-user.target

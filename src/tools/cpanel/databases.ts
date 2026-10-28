@@ -24,7 +24,7 @@ export const databaseTools = [
   uapiTool({
     name: "cpanel_delete_database",
     description: "Delete a MySQL database and all of its data",
-    mode: "destroy",
+    mode: "critical",
     module: "Mysql",
     fn: "delete_database",
     input: { name },
@@ -47,7 +47,7 @@ export const databaseTools = [
   uapiTool({
     name: "cpanel_delete_database_user",
     description: "Delete a MySQL user",
-    mode: "destroy",
+    mode: "critical",
     module: "Mysql",
     fn: "delete_user",
     input: { name },
@@ -75,7 +75,7 @@ export const databaseTools = [
   uapiTool({
     name: "cpanel_revoke_database_access",
     description: "Revoke all privileges of a MySQL user on a database",
-    mode: "destroy",
+    mode: "critical",
     module: "Mysql",
     fn: "revoke_access_to_database",
     input: { user, database },

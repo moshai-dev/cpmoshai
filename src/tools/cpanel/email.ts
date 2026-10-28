@@ -34,7 +34,7 @@ export const emailTools = [
   uapiTool({
     name: "cpanel_delete_email_account",
     description: "Delete an email account and its mailbox",
-    mode: "destroy",
+    mode: "critical",
     module: "Email",
     fn: "delete_pop",
     input: { email: z.string().min(1).describe("Local part, before the @"), domain },
@@ -83,7 +83,7 @@ export const emailTools = [
   uapiTool({
     name: "cpanel_delete_forwarder",
     description: "Delete an email forwarder",
-    mode: "destroy",
+    mode: "critical",
     module: "Email",
     fn: "delete_forwarder",
     input: {

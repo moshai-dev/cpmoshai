@@ -13,7 +13,7 @@ const whmCall: ToolDefinition<{ function: typeof identifier; params: typeof para
   name: "whm_call",
   description:
     "Call any WHM API 1 function by name. Use only when no dedicated whm_* tool exists",
-  mode: "destroy",
+  mode: "critical",
   input: { function: identifier, params },
   run: (args, client) => client.whm(args.function, args.params),
 };
@@ -27,7 +27,7 @@ const uapiCall: ToolDefinition<{
   name: "cpanel_uapi_call",
   description:
     "Call any cPanel UAPI function as an account. Use only when no dedicated cpanel_* tool exists",
-  mode: "destroy",
+  mode: "critical",
   input: {
     account: z.string().min(1).describe("cPanel account username to run the call as"),
     module: identifier,

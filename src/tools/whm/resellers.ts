@@ -20,7 +20,7 @@ export const resellerTools = [
   whmTool({
     name: "whm_setup_reseller",
     description: "Give an account reseller privileges",
-    mode: "write",
+    mode: "critical",
     fn: "setupreseller",
     input: { user, makeowner: z.boolean().optional().describe("Make it its own owner") },
   }),

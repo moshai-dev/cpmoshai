@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { readSecretFile } from "./secrets";
 
 const schema = z.object({
   CPANEL_HOST: z
@@ -6,7 +7,8 @@ const schema = z.object({
     .regex(/^[^/:\s]+$/, "hostname only, without scheme, port or path"),
   CPANEL_PORT: z.coerce.number().int().positive().default(2087),
   CPANEL_USER: z.string().min(1).default("root"),
-  CPANEL_TOKEN: z.string().min(1),
+  CPANEL_TOKEN: z.string().min(1).optional(),
+  CPANEL_TOKEN_FILE: z.string().min(1).optional(),
   CPANEL_INSECURE_TLS: z
     .enum(["true", "false"])
     .default("false")
@@ -32,11 +34,14 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     throw new Error(`Invalid configuration: ${problems}`);
   }
   const values = parsed.data;
+  if (Boolean(values.CPANEL_TOKEN) === Boolean(values.CPANEL_TOKEN_FILE)) {
+    throw new Error("Invalid configuration: set exactly one of CPANEL_TOKEN or CPANEL_TOKEN_FILE");
+  }
   return {
     host: values.CPANEL_HOST,
     port: values.CPANEL_PORT,
     user: values.CPANEL_USER,
-    token: values.CPANEL_TOKEN,
+    token: values.CPANEL_TOKEN ?? readSecretFile(values.CPANEL_TOKEN_FILE!),
     insecureTls: values.CPANEL_INSECURE_TLS,
     timeoutMs: values.CPANEL_TIMEOUT_MS,
   };

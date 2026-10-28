@@ -3,7 +3,9 @@ import type { CpanelClient } from "../client";
 
 export type Shape = z.ZodRawShape;
 
-export type Mode = "read" | "write" | "destroy";
+export const allModes = ["read", "write", "critical"] as const;
+
+export type Mode = (typeof allModes)[number];
 
 export interface ToolDefinition<S extends Shape = Shape> {
   name: string;

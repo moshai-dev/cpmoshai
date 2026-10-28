@@ -5,7 +5,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "bun run src/index.ts",
+    "start": "bun run src/cli.ts stdio",
+    "serve": "bun run src/cli.ts serve",
+    "cli": "bun run src/cli.ts",
+    "build": "bun build --compile --minify --no-compile-autoload-dotenv --no-compile-autoload-bunfig --target=bun-linux-x64 src/cli.ts --outfile dist/cpmoshai",
     "typecheck": "tsc --noEmit",
     "test": "bun test"
   },

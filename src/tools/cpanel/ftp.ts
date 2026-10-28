@@ -36,7 +36,7 @@ export const ftpTools = [
   uapiTool({
     name: "cpanel_delete_ftp_account",
     description: "Delete an FTP account",
-    mode: "destroy",
+    mode: "critical",
     module: "Ftp",
     fn: "delete_ftp",
     input: { user, destroy: z.boolean().optional().describe("Also delete its home directory") },

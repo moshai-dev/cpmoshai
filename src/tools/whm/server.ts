@@ -1,6 +1,20 @@
 import { z } from "zod";
 import { whmTool } from "../builders";
 
+const restartableServices = [
+  "httpd",
+  "exim",
+  "dovecot",
+  "named",
+  "mysql",
+  "ftpd",
+  "cpsrvd",
+  "cphulkd",
+  "queueprocd",
+  "cpanellogd",
+  "spamd",
+] as const;
+
 export const serverTools = [
   whmTool({
     name: "whm_version",
@@ -67,9 +81,9 @@ export const serverTools = [
   }),
   whmTool({
     name: "whm_restart_service",
-    description: "Restart a server service",
+    description: "Restart one of the allowlisted server services",
     mode: "write",
     fn: "restartservice",
-    input: { service: z.string().min(1).describe("e.g. httpd, exim, named") },
+    input: { service: z.enum(restartableServices) },
   }),
 ];

@@ -24,7 +24,7 @@ export const fileTools = [
   uapiTool({
     name: "cpanel_write_file",
     description: "Write a text file, replacing existing content",
-    mode: "destroy",
+    mode: "critical",
     module: "Fileman",
     fn: "save_file_content",
     input: { dir, file, content: z.string() },
