@@ -2,7 +2,7 @@
 
 MCP server for cPanel and WHM, built with Bun. It runs on the cPanel server itself, behind Apache, and ships as one compiled binary.
 
-- **97 tools** (49 read-only, 29 write, 19 needing 2FA approval) over WHM API 1 and cPanel UAPI, plus server debugging tools (service status, journal logs, load, disk, memory, processes, ports).
+- **102 tools** (54 read-only, 29 write, 19 needing 2FA approval) over WHM API 1 and cPanel UAPI, plus server debugging tools (service status, journal logs, load, disk, memory, processes, ports) and update/end-of-life audits.
 - **Layered authentication** for remote access, and **human 2FA approval** for dangerous calls that the AI client can never see or answer.
 
 ## Security model
@@ -64,6 +64,28 @@ Follow the steps it prints:
 
 Optional settings in `/etc/cpmoshai/env`: `CPMOSHAI_ALLOWED_IPS` (comma-separated CIDRs), `CPMOSHAI_ALLOWED_ORIGINS`, `CPMOSHAI_SOCKET`, `CPMOSHAI_STATE_DIR`, `CPMOSHAI_TOTP_FILE`, `CPANEL_INSECURE_TLS`.
 
+## Set up 2FA
+
+Needed once, before any critical tool can be approved. Use any TOTP app (Google Authenticator, Authy, 1Password, Aegis).
+
+```bash
+cpmoshai totp init
+```
+
+1. It prints a **key** and an `otpauth://` **uri**. In your authenticator app choose *Add account > Enter a setup key*, then type the key (account `cpmoshai`, time-based, 6 digits, 30 seconds). If you prefer a QR code, `qrencode -t ANSIUTF8 '<uri>'` renders one.
+2. It asks for the current 6-digit code. Enter it to prove the app is set up correctly. Nothing is saved until the code matches.
+3. The secret is saved to `/etc/cpmoshai/totp.json` (`root:root 0600`). Keep the server clock accurate (`chronyc tracking`), because codes depend on time.
+
+Using it later:
+
+```bash
+cpmoshai pending          # what is waiting
+cpmoshai approve a0324b6abb5f
+cpmoshai deny a0324b6abb5f
+```
+
+Lost your phone? There are no recovery codes by design. As root run `rm /etc/cpmoshai/totp.json` and `cpmoshai totp init` again. The AI cannot do this, because it has no shell on the server.
+
 ## Connect a client
 
 ```bash
@@ -84,6 +106,26 @@ cpmoshai deny <id>
 ```
 
 Run `cpmoshai` as root for `totp`, `approve` and `keys`; files stay owned by the right account.
+
+## Update and vulnerability audits
+
+Ask things like "is my PHP safe?" or "what needs updating?". The `audit_*` tools check installed software against its vendor lifecycle and report `ok`, `info`, `warning` or `critical` with a plain recommendation.
+
+| Tool | Checks |
+| --- | --- |
+| `audit_server` | Everything below in one call, worst first. A failed check is listed, the rest still run. |
+| `audit_php` | Each installed `ea-php*` version: exact version, end-of-life and security-support dates, newer patch release, and which sites use it. |
+| `audit_cpanel` | cPanel & WHM version against cPanel's release tiers and LTS expiry. |
+| `audit_os` | AlmaLinux, Rocky, CentOS, RHEL, CloudLinux (via RHEL) or Ubuntu support dates. |
+| `audit_database` | MySQL or MariaDB support dates. |
+
+How to read the result:
+
+- **end-of-life** (critical): no more security fixes, so treat it as vulnerable. Move sites with `whm_php_set_vhost_version`, then remove the old version.
+- **security-only** (info, or warning inside 6 months of the end): still patched, but plan the upgrade.
+- **patch available** (warning): the installed release is behind the latest one. The recommendation names the update command.
+
+This is a lifecycle check, not a CVE scanner. Data comes from endoflife.date and cPanel's public tier file (cached 12 hours); the only thing sent is the product name, and the server needs outbound HTTPS to `endoflife.date` and `httpupdate.cpanel.net`. PHP versions are read from EasyApache (`/opt/cpanel/ea-php*`); CloudLinux alt-php is not covered.
 
 ## Tools
 
